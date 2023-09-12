@@ -1,0 +1,6 @@
+--Búsqueda de patrones en una columna
+SELECT * 
+FROM ADELIA.PERSONA P
+WHERE REGEXP_LIKE(TRIM(P.APELLIDO) || ' ' || TRIM(P.NOMBRE), 'GONZALEZ|CRUZ|GOMEZ');
+
+--
