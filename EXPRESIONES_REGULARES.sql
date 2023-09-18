@@ -185,3 +185,4 @@ WHERE P.FECHA_NACIMIENTO IS NOT NULL
 
 {4}: Aquí, se esperan exactamente cuatro dígitos. Esto garantiza que se capturen los números del año en formato de cuatro dígitos (por ejemplo, "2023").
 */
+
