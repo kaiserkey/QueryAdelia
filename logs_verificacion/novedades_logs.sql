@@ -1,8 +1,12 @@
+
+SELECT *
+FROM ADELIA.HLL_LOG_OBJECT_DEFINITION HLOD;
+
 --CONTAR LA CANTIDAD DE LOGS INSERTADOS EN LA FECHA 4092023 - LOGS DE NOVEDAD
 SELECT COUNT(*)
 FROM ADELIA.HLL_LOG_OBJECT_DEFINITION HLOD
 WHERE 1=1
-      AND HLOD.OLMARK = '22092023'
+      AND HLOD.OLMARK IN ('4092023', '22092023', '20102023')
 
 ;
 
@@ -34,7 +38,7 @@ WHERE 1=1 --FILTRAR LOS LOGS QUE NO TIENEN NOVEDAD CREADA
                                FROM ADELIA.HLL_LOG_OBJECT_DEFINITION HLOD
                                WHERE 1=1
                                      AND LOWER(TRIM(HLOD.DESCRIPTION)) = 'novedad' AND LOWER(TRIM(HLOD.DEFINITION_KEY)) = 'novedad'
-                                     AND HLOD.OLMARK IN ('4092023', '22092023')
+                                     AND HLOD.OLMARK IN ('4092023', '22092023', '20102023')
                                      AND HLOD.HLL_DEFINITION_SOURCE = '[ :receiver :args | receiver ]') 
 
 --SELECT TO_CHAR(SYSDATE, 'DDMMYYYY') from dual;
