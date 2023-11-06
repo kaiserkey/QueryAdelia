@@ -250,3 +250,121 @@ EXCEPTION
         DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
 END;
 /
+
+--Procedimientos y Funciones Almacenados: PL/SQL se usa para escribir procedimientos y funciones almacenados en la base de datos. Estos son bloques de código reutilizables que pueden ser llamados desde aplicaciones o incluso desde otras partes de la base de datos. Los procedimientos y funciones almacenados son útiles para realizar operaciones complejas y lógicas en la base de datos.
+
+CREATE OR REPLACE PROCEDURE GET_PERSONA_DETAILS (PERSONA_ID NUMBER) AS
+    -- declarar variables para almacenar los detalles de la persona
+    P_ID PERSONAS.PERSONID%TYPE;
+    P_LAST_NAME PERSONAS.LASTNAME%TYPE;
+    P_FIRST_NAME PERSONAS.FIRSTNAME%TYPE;
+    P_ADDRESS PERSONAS.ADDRESS%TYPE;
+    P_CITY PERSONAS.CITY%TYPE;
+BEGIN
+    -- lógica para recuperar los detalles de la persona basados en el ID
+    FOR REC IN (SELECT * FROM PERSONAS P WHERE P.PERSONID = PERSONA_ID) LOOP
+        P_ID := REC.PERSONID;
+        P_LAST_NAME := REC.LASTNAME;
+        P_FIRST_NAME := REC.FIRSTNAME;
+        P_ADDRESS := REC.ADDRESS;
+        P_CITY := REC.CITY;
+        
+        -- mostrar la salida con dbms_output.put_line
+        DBMS_OUTPUT.ENABLE;
+        DBMS_OUTPUT.PUT_LINE('PersonID: ' || P_ID || ', LastName: ' || P_LAST_NAME || ', FirstName: ' || P_FIRST_NAME || ', Address: ' || P_ADDRESS || ', City: ' || P_CITY);
+    END LOOP;
+END;
+/
+
+DECLARE
+    -- declarar una variable para el ID de la persona que deseas buscar
+    PERSONA_ID NUMBER := 1; -- reemplaza 123 con el ID de la persona que estás buscando
+    
+BEGIN
+    -- llamar al procedimiento
+    GET_PERSONA_DETAILS(PERSONA_ID);
+END;
+/
+
+--Para obtener los resultados de un procedimiento almacenado en una consulta SQL, puedes usar una función en lugar de un procedimiento. Las funciones en PL/SQL pueden retornar un valor, y ese valor puede ser utilizado en una consulta SQL.
+
+CREATE OR REPLACE FUNCTION GET_PERSONA_DETAILS_func (PERSONA_ID NUMBER) RETURN VARCHAR2 AS
+    -- declarar variables para los detalles de la persona
+    P_DETAILS VARCHAR2(1000);
+BEGIN
+    -- lógica para recuperar los detalles del empleado basados en el ID
+    FOR REC IN (SELECT * FROM PERSONAS P WHERE P.PERSONID = PERSONA_ID) LOOP
+        P_DETAILS := 'PersonID: ' || REC.PERSONID || ', LastName: ' || REC.LASTNAME || ', FirstName: ' || REC.FIRSTNAME || ', Address: ' || REC.ADDRESS || ', City: ' || REC.CITY;
+    END LOOP;
+    -- retornar los detalles como resultado de la función
+    RETURN P_DETAILS;
+END;
+/
+
+SELECT GET_PERSONA_DETAILS_func(1) FROM DUAL;
+
+--En PL/SQL puedes usar tipos de datos definidos por el usuario (User-Defined Types, UDTs) para crear estructuras de datos complejas que pueden contener múltiples valores. Una de las formas de devolver múltiples valores desde una función en PL/SQL es usando un tipo de tabla definido por el usuario.
+
+CREATE OR REPLACE TYPE PERSONDETAIL AS OBJECT (
+    PERSONID NUMBER,
+    LASTNAME VARCHAR2(255),
+    FIRSTNAME VARCHAR2(255),
+    Address VARCHAR2(255),
+    City VARCHAR2(255)
+);
+/
+--definir un tipo de tabla para almacenar detalles de personas
+CREATE OR REPLACE TYPE PERSONDETAILLIST AS TABLE OF PERSONDETAIL;
+/
+
+--crear una función que retorna esta lista de detalles de persona:
+CREATE OR REPLACE FUNCTION GET_PERSONA_DETAILS_LIST (PERSONA_ID NUMBER) RETURN PERSONDETAILLIST PIPELINED AS
+BEGIN
+    -- lógica para recuperar los detalles del empleado basados en el ID
+    FOR REC IN (SELECT * FROM PERSONAS P WHERE P.PERSONID >= PERSONA_ID) LOOP
+        PIPE ROW(PERSONDETAIL(REC.PERSONID, REC.LASTNAME, REC.FIRSTNAME, REC.ADDRESS, REC.CITY));
+    END LOOP;
+    -- retornar los detalles como una lista usando PIPELINED
+END;
+/
+
+--usar la función en una consulta SQL para obtener la lista de detalles de persona
+SELECT * FROM TABLE(GET_PERSONA_DETAILS(1));
+
+
+--trigger para la tabla PERSONAS que verifica si la columna PERSONID está en el rango específico
+CREATE OR REPLACE TRIGGER CHECK_PERSON_ID
+BEFORE INSERT OR UPDATE ON PERSONAS
+FOR EACH ROW
+BEGIN
+    IF :NEW.PERSONID < 1000 OR :NEW.PERSONID > 9999 THEN
+        RAISE_APPLICATION_ERROR(-20001, 'PERSONID should be a 4-digit number');
+    END IF;
+END;
+/
+
+--un ejemplo de un bloque anónimo PL/SQL que maneja excepciones para la tabla PERSONAS
+DECLARE
+    V_LASTNAME VARCHAR2(255);
+BEGIN
+    -- Intentar seleccionar un apellido de la tabla PERSONAS
+    SELECT LASTNAME INTO V_LASTNAME FROM PERSONAS WHERE PERSONID = 1;
+
+    -- Mostrar el apellido seleccionado
+    DBMS_OUTPUT.PUT_LINE('Apellido: ' || V_LASTNAME);
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        -- Manejar la excepción de "ningún dato encontrado"
+        DBMS_OUTPUT.PUT_LINE('No se encontraron datos para el ID especificado.');
+    WHEN OTHERS THEN
+        -- Manejar cualquier otra excepción
+        DBMS_OUTPUT.PUT_LINE('Ocurrió un error: ' || SQLERRM);
+END;
+/
+
+
+
+
+
+
