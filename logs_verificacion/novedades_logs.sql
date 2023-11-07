@@ -6,7 +6,7 @@ FROM ADELIA.HLL_LOG_OBJECT_DEFINITION HLOD;
 SELECT COUNT(*)
 FROM ADELIA.HLL_LOG_OBJECT_DEFINITION HLOD
 WHERE 1=1
-      AND HLOD.OLMARK IN ('4092023', '22092023', '20102023')
+      AND HLOD.OLMARK IN ('4092023', '22092023', '20102023', '07112023')
 
 ;
 
@@ -25,6 +25,8 @@ INSERT INTO ADELIA.HLL_LOG_OBJECT_DEFINITION HLOD (HLOD.OBJECTID,
                                                    HLOD.HLL_DEFINITION_SOURCE)
 VALUES (ADELIA.NEWOID('204C'), TO_CHAR(SYSDATE, 'DDMMYYYY'), 'NOVEDAD', 'NOVEDAD', '768557B9F51A0A70084D', '[ :receiver :args | receiver ]')
 ;
+
+
 INSERT INTO ADELIA.HLL_LOG_OBJECT_DEFINITION HLOD (HLOD.OBJECTID,
                                                    HLOD.HLL_USE, 
                                                    HLOD.DEFINITION_KEY, 
@@ -38,7 +40,7 @@ WHERE 1=1 --FILTRAR LOS LOGS QUE NO TIENEN NOVEDAD CREADA
                                FROM ADELIA.HLL_LOG_OBJECT_DEFINITION HLOD
                                WHERE 1=1
                                      AND LOWER(TRIM(HLOD.DESCRIPTION)) = 'novedad' AND LOWER(TRIM(HLOD.DEFINITION_KEY)) = 'novedad'
-                                     AND HLOD.OLMARK IN ('4092023', '22092023', '20102023')
+                                     AND HLOD.OLMARK IN ('4092023', '22092023', '20102023', '07112023')
                                      AND HLOD.HLL_DEFINITION_SOURCE = '[ :receiver :args | receiver ]') 
 
 --SELECT TO_CHAR(SYSDATE, 'DDMMYYYY') from dual;
@@ -53,7 +55,7 @@ WHERE 1=1
                             FROM ADELIA.HLL_LOG_OBJECT_DEFINITION HLOD
                             WHERE 1=1
                                   AND LOWER(TRIM(HLOD.DESCRIPTION)) = 'novedad' AND LOWER(TRIM(HLOD.DEFINITION_KEY)) = 'novedad'
-                                  AND HLOD.OLMARK = '4092023'
+                                  AND HLOD.OLMARK IN ('4092023', '22092023', '20102023', '07112023')
                                   AND HLOD.HLL_DEFINITION_SOURCE = '[ :receiver :args | receiver ]'
                             )
 
